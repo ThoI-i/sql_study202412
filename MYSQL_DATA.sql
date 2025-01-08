@@ -49,7 +49,7 @@ CREATE TABLE hashtags
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- 게시물-해시태그 연결 테이블
+-- 게시물 해시태그 연결 테이블
 CREATE TABLE post_hashtags
 (
     id         BIGINT AUTO_INCREMENT PRIMARY KEY,
@@ -59,12 +59,33 @@ CREATE TABLE post_hashtags
     FOREIGN KEY (post_id) REFERENCES posts (id) ON DELETE CASCADE,
     FOREIGN KEY (hashtag_id) REFERENCES hashtags (id) ON DELETE CASCADE,
     UNIQUE KEY unique_post_hashtag (post_id, hashtag_id)
-);
+)
+;
+
+
 
 SELECT * FROM posts;
 SELECT * FROM hashtags;
 SELECT * FROM post_hashtags;
 
+-- 특정 단어로 시작하는 해시태그 검색하기(A)
+SELECT
+	h.name
+FROM hashtags h
+WHERE name LIKE '나%'
+LIMIT 5
+;
+
+-- 각 해시태그들이 달린 게시물 수 확인하기(B)
+SELECT
+	hashtag_id
+    , COUNT(post_id)
+FROM post_hashtags
+GROUP BY hashtag_id
+ORDER BY hashtag_id
+;
+
+-- (A) + (B)
 SELECT
 	 p.name
 	, COUNT(ph.post_id) feed_count
@@ -77,7 +98,7 @@ ORDER BY feed_count DESC
 LIMIT 3
 ;
 
-인덱스 추가
+-- 인덱스 추가
 CREATE INDEX idx_hashtag_name ON hashtags (name);
 CREATE INDEX idx_post_hashtags_post_id ON post_hashtags (post_id);
 CREATE INDEX idx_post_hashtags_hashtag_id ON post_hashtags (hashtag_id);
